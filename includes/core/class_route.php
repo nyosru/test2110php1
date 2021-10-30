@@ -36,8 +36,10 @@ class Route {
     // ROUTES
 
     private static function route_common() {
+        
         if (self::$path == 'home') return controller_home();
         return '';
+
     }
 
 }

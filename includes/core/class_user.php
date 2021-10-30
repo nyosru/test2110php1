@@ -56,12 +56,17 @@ class User {
 
     // TEST
 
-    public static function owner_info() {
+    public static function owner_info( $requery ) {
         // your code here ...
+        // добавил входящие параметры .. так как без них всегда будет пустой ответ (массив)
+        return self::user_info($requery);
     }
 
     public static function owner_update($data = []) {
         // your code here ...
+
+        
+        return [ 'status' => 'ok' ];
     }
 
 }
