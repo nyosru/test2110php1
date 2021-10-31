@@ -28,11 +28,13 @@ $g['year'] = date('Y');
 // API response 
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if ($g['path'] == 'user.get') {
+        header('Content-type:application/json;charset=utf-8'); 
         die(json_encode(User::owner_info($_REQUEST)));
     }
 } else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($g['path'] == 'user.update') {
-        die(json_encode(User::owner_update($_POST)));
+        header('Content-type:application/json;charset=utf-8'); 
+        die(json_encode(User::owner_update($_REQUEST)));
     }
 }
 
