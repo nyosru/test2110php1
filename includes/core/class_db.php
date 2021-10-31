@@ -5,6 +5,9 @@ class DB
 
     private static $db;
 
+    public static $updateQuery = '';
+    public static $updateVar = [];
+
     public static function connect()
     {
         if (!self::$db) {
@@ -20,15 +23,37 @@ class DB
     /**
      * запрос с защищёнными данными с помощью PDO
      */
-    public static function query2($q, $data)
+    public static function query_update($id_pole, $id_value)
     {
-        try {
-            $sql = self::connect()->prepare($q);
-            return $sql->execute($data);
-        } catch (PDOException $e) {
-            die('Error!: ' . $e->getMessage() . '<br/>');
-        }
+        // ключевой id
+        self::$updateVar[':' . $id_pole] = $id_value;
+        // запрос и выполнение
+        $sql = self::connect()->prepare('UPDATE `users` SET ' . self::$updateQuery . ' WHERE `' . $id_pole . '` = :' . $id_pole);
+        $result = $sql->execute(self::$updateVar);
+        // трём данные
+        self::newUpdate();
+        // возвращаем результат обработки запроса
+        return $result;
     }
+
+    public static function newUpdate()
+    {
+        self::$updateQuery = '';
+        self::$updateVar = [];
+    }
+
+    public static function add_pole_to_update($pole, $value)
+    {
+
+        // приводим данные к нужному виду
+        if ($pole == 'email') $value = strtolower($value);
+        else if ($pole == 'phone') $value = flt_phone_number($value);
+
+        self::$updateQuery .= (!empty(self::$updateQuery) ? ',' : '') . ' `' . $pole . '` = :' . $pole . ' ';
+        self::$updateVar[':' . $pole] = $value;
+
+    }
+
 
     public static function query($q)
     {

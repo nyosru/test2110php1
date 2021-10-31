@@ -80,9 +80,19 @@ function phone_formatting($phone)
 
 /**
  * возвращаем или только цифры номера или false если номер не норм
+ * в начале "7" и 11 в длинну
  */
 function flt_phone_number($str)
 {
     $result = preg_replace("/[^,.0-9]/", '', $str);
-    return (strlen($result) == 11) ? $result : false;
+    return ($result{0} == 7 && strlen($result) == 11) ? $result : false;
+}
+
+/**
+ * возвращаем результат Апи
+ */
+function return_result_api($array)
+{
+    header('Content-type:application/json;charset=utf-8');
+    die(json_encode($array));
 }

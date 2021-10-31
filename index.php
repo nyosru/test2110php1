@@ -26,15 +26,20 @@ $g['year'] = date('Y');
 // не использовать явных доп проверок и ускорит процесс
 
 // API response 
-if ($_SERVER['REQUEST_METHOD'] == 'GET') {
-    if ($g['path'] == 'user.get') {
-        header('Content-type:application/json;charset=utf-8'); 
-        die(json_encode(User::owner_info($_REQUEST)));
+if ( Route::$method == 'GET') {
+    if (Route::$path == 'user.get') {
+        return_result_api(User::owner_info($_REQUEST));
     }
-} else if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if ($g['path'] == 'user.update') {
-        header('Content-type:application/json;charset=utf-8'); 
-        die(json_encode(User::owner_update($_REQUEST)));
+    // получаем уведомления ( возможен флаг show_unreaded = *** если есть то только непрочитанные )
+    elseif (Route::$path == 'notifications.get') {
+        return_result_api(Notification::get($_REQUEST['get_unread'] ?? ''));
+    }
+} else if ( Route::$method == 'POST') {
+    if (Route::$path == 'user.update') {
+        return_result_api(User::owner_update($_REQUEST));
+    }
+    elseif (Route::$path == 'notifications.read') {
+        return_result_api(Notification::set_readed());
     }
 }
 

@@ -6,6 +6,7 @@ class Route {
 
     public static $path = '';
     public static $query = [];
+    public static $method = '';
 
     // GENERAL
 
@@ -31,6 +32,9 @@ class Route {
                 self::$query[$key] = $value;
             }
         }
+
+        self::$method = $_SERVER['REQUEST_METHOD'];
+
     }
 
     // ROUTES

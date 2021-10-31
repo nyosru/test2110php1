@@ -63,51 +63,40 @@ class User
     {
 
         // сначала выявим ошибки
-        if (empty($data['id']) || empty($data['first_name']) || empty($data['last_name']) || empty($data['phone'])) {
+        if (
+            empty($data['id']) 
+            || empty($data['first_name']) 
+            || empty($data['last_name']) 
+            || empty($data['phone']) 
+            || !isset($data['middle_name']) 
+            || !isset($data['email']) 
+            ) {
             // можно запускать исключение и его отлавливать/отслеживать там где мы вызываем этот метод
             //  throw new Exception("Error Processing Request", 1);                        
             return ['status' => 'error', 'error_text' => 'не все поля заполнены'];
         }
 
         // если ошибок нет то уже обрабатываем велидируем и отправляем запрос
-        // `first_name`, `last_name`, `middle_name`, `email` и `phone`
-        $inSqlVars = [];
-        $inSqlVars[':id'] = $data['id'];
 
-        $inSql = ' `first_name` = :first_name ';
-        $inSqlVars[':first_name'] = $data['first_name'];
+        DB::add_pole_to_update( 'phone', $data['phone'] );
+        if ( empty(DB::$updateVar[':phone']) ) return ['status' => 'error', 'error_text' => 'телефон указан не верно ( пример +7(999)888-77-66 )'];
 
-        $inSql .= ' , ';
-        $inSql .= ' `last_name` = :last_name ';
-        $inSqlVars[':last_name'] = $data['last_name'];
+        DB::add_pole_to_update('first_name', $data['first_name']);
+        DB::add_pole_to_update('last_name', $data['last_name']);
+        // могут быть нулём
+        DB::add_pole_to_update('middle_name', $data['middle_name'] ?? null );
+        DB::add_pole_to_update('email', $data['email'] ?? null );
 
-        // // добавляем email так как в базе он не равен нулю
-        // $inSql .= ' , ';
-        // $inSql .= ' `email` = :email ';
-        // $inSqlVars[':email'] = 'ya@ya.ru';
-
-        // $inSql .= ' , ';
-        // $inSql .= ' , `phone` = :phone ';
-        // $inSqlVars[':phone'] = $data['phone'];
-
-        $inSql .= ' , ';
-        $inSql .= ' `phone` = :phone ';
-        $inSqlVars[':phone'] = flt_phone_number($data['phone']);
-
-        if (!$inSqlVars[':phone']) return ['status' => 'error', 'error_text' => 'телефон указан не верно ( пример +7(999)888-77-66 )'];
-
-        $sql_query = 'UPDATE `users` SET ' . $inSql . ' WHERE `user_id` = :id';
-        $result = DB::query2($sql_query , $inSqlVars );
+        $result = DB::query_update( 'user_id', $data['id'] );
 
         // output
         // return $user_id;
         return [
-            'status' => 'ok', 
+            'status' => 'ok',
             'result_sql' => $result,
             // 'sql_query' => $sql_query,
             // 'sql_data' => $inSqlVars
         ];
-
     }
 
     // TEST
